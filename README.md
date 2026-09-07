@@ -13,7 +13,7 @@ Instead of manually performing database operations, the user can interact with t
 * Show the bill
 * Finalize the bill with UPI
 * Show low stock products
-* Check Ramesh balance
+* Check balance
 
 The AI agent identifies the user's request and invokes the appropriate backend tool to perform the operation safely.
 
