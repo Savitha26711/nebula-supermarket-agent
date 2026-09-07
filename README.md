@@ -92,7 +92,7 @@ The AI agent identifies the user's request and invokes the appropriate backend t
                       │
         ┌─────────────┼─────────────┐
         ▼             ▼             ▼
-   Inventory       Billing       Khata
+    Inventory       Billing       Khata
      Tools          Tools         Tools
         │             │             │
         └─────────────┼─────────────┘
