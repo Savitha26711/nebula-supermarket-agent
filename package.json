@@ -1,0 +1,30 @@
+{
+  "name": "nebula-supermarket-agent",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/google": "^4.0.64",
+    "@ai-sdk/openai": "^4.0.60",
+    "ai": "^7.0.93",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.9.5",
+    "openai": "^7.10.0",
+    "pdfkit": "^0.20.2",
+    "pptxgenjs": "^4.0.1",
+    "telegraf": "^4.16.3",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
