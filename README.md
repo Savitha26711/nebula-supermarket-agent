@@ -168,36 +168,26 @@ Status:   FINALIZED
 ## 📁 Project Structure
 
 
-nebula-supermarket-agent/
-│
-├── src/
-│   ├── agent/
-│   │   ├── llmAgent.js
-│   │   ├── tools.js
-│   │   └── ...
-│   │
-│   ├── bot/
-│   │   └── test-bot.js
-│   │
-│   ├── database/
-│   │   ├── db.js
-│   │   └── schema.sql
-│   │
-│   ├── services/
-│   │   ├── invoiceService.js
-│   │   └── reportService.js
-│   │
-│   └── tools/
-│       ├── billingTools.js
-│       ├── inventoryTools.js
-│       ├── khataTools.js
-│       └── preferenceTools.js
-│
-├── package.json
-├── package-lock.json
-├── .gitignore
-└── README.md
-
+                 ┌──────────────────────────┐
+                 │  🤖 Nebula Supermarket   │
+                 │          Agent           │
+                 └────────────┬─────────────┘
+                              │
+             ┌────────────────┼────────────────┐
+             │                │                │
+             ▼                ▼                ▼
+       ┌──────────┐     ┌──────────┐     ┌──────────┐
+       │  Agent   │     │ Telegram │     │ Database │
+       │          │     │   Bot    │     │  SQLite  │
+       └────┬─────┘     └──────────┘     └────┬─────┘
+            │                                  │
+     ┌──────┴──────┐                    ┌──────┴──────┐
+     ▼             ▼                    ▼             ▼
+    llmAgent.js   tools.js              bills        products
+                                      │
+                         ┌────────────┼────────────┐
+                         ▼            ▼            ▼
+                    Inventory      Khata        GST/Billing
 
 ## ⚙️ Installation
 
