@@ -7,12 +7,13 @@ async function main() {
 
   let session = {};
 
-  const messages = [
-    "Create a bill",
-    "Add 2 Maggi",
-    "Show the bill",
-    "Finalize the bill with UPI",
-  ];
+const messages = [
+  "Create a bill for Ravi",
+  "Add 2 Maggi",
+  "Finalize the bill with CREDIT for Ravi",
+  "Show Ravi's khata balance",
+  "Show Ravi's khata history",
+];
 
   for (const message of messages) {
     console.log("\n================================");

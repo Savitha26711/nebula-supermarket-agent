@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const {
@@ -130,38 +129,41 @@ IMPORTANT RULES:
 
 20. For Khata operations, always use the customer/khata tools.
 
-21. Never invent a customer's balance.
+21. Khata tools identify customers using customerName.
+    Always provide customerName when using Khata tools.
 
-22. For invoice requests, use generate_invoice.
+22. Never invent a customer's balance.
 
-23. For report requests, use generate_report.
+23. For invoice requests, use generate_invoice.
 
-24. Never invent saved preferences or memory.
+24. For report requests, use generate_report.
 
-25. When the user asks to remember or save a preference,
+25. Never invent saved preferences or memory.
+
+26. When the user asks to remember or save a preference,
     use save_preference.
 
-26. When the user asks about a saved preference,
+27. When the user asks about a saved preference,
     use get_preference.
 
-27. When relevant, use saved preferences from get_preferences.
+28. When relevant, use saved preferences from get_preferences.
 
-28. Do not save sensitive personal information as preferences.
+29. Do not save sensitive personal information as preferences.
 
-29. Keep responses clear and concise for a Telegram chat.
+30. Keep responses clear and concise for a Telegram chat.
 
-30. If a tool returns an error, explain the actual error
+31. If a tool returns an error, explain the actual error
     clearly instead of pretending the operation succeeded.
 
-31. Ask for missing information when it is genuinely required.
+32. Ask for missing information when it is genuinely required.
 
-32. Do not perform destructive or financial actions unless
+33. Do not perform destructive or financial actions unless
     the user's request clearly indicates the action.
 
-33. Current active bill ID:
+34. Current active bill ID:
     ${currentBillId || "NONE"}
 
-34. Current user ID:
+35. Current user ID:
     ${String(userId)}
 `;
 
@@ -404,12 +406,16 @@ IMPORTANT RULES:
       },
     }),
 
+    // =======================================================
+    // KHATA
+    // =======================================================
+
     add_khata_credit: tool({
       description:
-        "Add a credit/debt transaction to a customer's Khata.",
+        "Add a credit/debt transaction to a customer's Khata. Use the customer's name.",
 
       inputSchema: z.object({
-        customerId: z.number(),
+        customerName: z.string(),
         amount: z.number().positive(),
         description: z.string().optional(),
       }),
@@ -423,10 +429,10 @@ IMPORTANT RULES:
 
     record_khata_payment: tool({
       description:
-        "Record a payment made by a customer against Khata.",
+        "Record a payment made by a customer against Khata. Use the customer's name.",
 
       inputSchema: z.object({
-        customerId: z.number(),
+        customerName: z.string(),
         amount: z.number().positive(),
         description: z.string().optional(),
       }),
@@ -440,10 +446,10 @@ IMPORTANT RULES:
 
     get_khata_balance: tool({
       description:
-        "Get the current outstanding Khata balance for a customer.",
+        "Get the current outstanding Khata balance for a customer. Use the customer's name.",
 
       inputSchema: z.object({
-        customerId: z.number(),
+        customerName: z.string(),
       }),
 
       execute: async (args) => {
@@ -455,10 +461,10 @@ IMPORTANT RULES:
 
     get_khata_history: tool({
       description:
-        "Get the Khata transaction history of a customer.",
+        "Get the Khata transaction history of a customer. Use the customer's name.",
 
       inputSchema: z.object({
-        customerId: z.number(),
+        customerName: z.string(),
       }),
 
       execute: async (args) => {
@@ -629,6 +635,7 @@ IMPORTANT RULES:
 
   if (result.steps) {
     for (const step of result.steps) {
+
       if (!step.toolResults) {
         continue;
       }
@@ -690,4 +697,3 @@ IMPORTANT RULES:
 module.exports = {
   runAgent,
 };
-

@@ -4,7 +4,8 @@ const {
     createDraftBill,
     addItemToBill,
     removeItemFromBill,
-    getBill
+    getBill,
+    finalizeBill
 } = require("./billingTools");
 
 try {
@@ -66,6 +67,64 @@ try {
 
     console.log("\n📦 Stock after editing draft:");
     console.log(finalStock.quantity);
+        // 8. Create a fresh bill for finalize test
+    console.log("\n🧾 Creating bill for finalize test...");
+
+    const finalizeTestBill = createDraftBill();
+
+    addItemToBill({
+        billId: finalizeTestBill.billId,
+        productId: product.id,
+        quantity: 2
+    });
+
+    const stockBeforeFinalize = db
+        .prepare("SELECT quantity FROM products WHERE id = ?")
+        .get(product.id);
+
+    console.log("\n📦 Stock before finalize:");
+    console.log(stockBeforeFinalize.quantity);
+
+    // 9. First finalize
+    console.log("\n💳 First finalize...");
+
+    const finalized = finalizeBill({
+        billId: finalizeTestBill.billId,
+        paymentMode: "UPI",
+        paymentReference: "TEST-UPI-001"
+    });
+
+    console.log(finalized);
+
+    const stockAfterFirstFinalize = db
+        .prepare("SELECT quantity FROM products WHERE id = ?")
+        .get(product.id);
+
+    console.log("\n📦 Stock after first finalize:");
+    console.log(stockAfterFirstFinalize.quantity);
+
+    // 10. Second finalize - should be refused
+    console.log("\n🚫 Second finalize attempt...");
+
+    try {
+        finalizeBill({
+            billId: finalizeTestBill.billId,
+            paymentMode: "UPI",
+            paymentReference: "TEST-UPI-002"
+        });
+
+        console.log("❌ ERROR: Duplicate finalize was accepted!");
+    } catch (error) {
+        console.log("✅ Duplicate finalize refused:");
+        console.log(error.message);
+    }
+
+    const stockAfterSecondFinalize = db
+        .prepare("SELECT quantity FROM products WHERE id = ?")
+        .get(product.id);
+
+    console.log("\n📦 Stock after second finalize:");
+    console.log(stockAfterSecondFinalize.quantity);
 
 } catch (error) {
 

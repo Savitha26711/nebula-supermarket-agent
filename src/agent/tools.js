@@ -76,13 +76,13 @@ create_draft_bill: async () => {
     return khataTools.getCustomer(args);
   },
 
-  add_khata_credit: async (args) => {
-    return khataTools.addKhataCredit(args);
-  },
+ add_khata_credit: async (args) => {
+    return khataTools.addCredit(args);
+},
 
-  record_khata_payment: async (args) => {
-    return khataTools.recordKhataPayment(args);
-  },
+record_khata_payment: async (args) => {
+    return khataTools.recordPayment(args);
+},
 
   get_khata_balance: async (args) => {
     return khataTools.getKhataBalance(args);

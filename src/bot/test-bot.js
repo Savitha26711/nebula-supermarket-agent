@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const { Telegraf } = require("telegraf");
@@ -8,7 +9,7 @@ const { runAgent } = require("../agent/llmAgent");
 // ============================================================
 
 if (!process.env.TELEGRAM_BOT_TOKEN) {
-throw new Error("TELEGRAM_BOT_TOKEN is missing in .env");
+    throw new Error("TELEGRAM_BOT_TOKEN is missing in .env");
 }
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
@@ -23,17 +24,13 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const sessions = new Map();
 
 function getSession(userId) {
+    if (!sessions.has(userId)) {
+        sessions.set(userId, {
+            currentBillId: null
+        });
+    }
 
-
-if (!sessions.has(userId)) {
-    sessions.set(userId, {
-        currentBillId: null
-    });
-}
-
-return sessions.get(userId);
-
-
+    return sessions.get(userId);
 }
 
 // ============================================================
@@ -41,18 +38,14 @@ return sessions.get(userId);
 // ============================================================
 
 bot.start(async (ctx) => {
-
-
-await ctx.reply(
-    "🤖 Nebula Supermarket Agent is online!\n\n" +
-    "You can ask me things like:\n" +
-    "• What is the price of Maggi?\n" +
-    "• How much Maggi is in stock?\n" +
-    "• Show low stock products\n" +
-    "• Create a bill\n"
-);
-
-
+    await ctx.reply(
+        "🤖 Nebula Supermarket Agent is online!\n\n" +
+        "You can ask me things like:\n" +
+        "• What is the price of Maggi?\n" +
+        "• How much Maggi is in stock?\n" +
+        "• Show low stock products\n" +
+        "• Create a bill\n"
+    );
 });
 
 // ============================================================
@@ -61,67 +54,62 @@ await ctx.reply(
 
 bot.on("text", async (ctx) => {
 
+    const message = ctx.message.text;
 
-const message = ctx.message.text;
+    // Telegram user ID
+    const userId = String(ctx.from.id);
 
-// Telegram user ID
-const userId = String(ctx.from.id);
+    console.log("\n📩 Telegram message:");
+    console.log("User:", userId);
+    console.log("Message:", message);
 
-console.log("\n📩 Telegram message:");
-console.log("User:", userId);
-console.log("Message:", message);
+    // Get/create session
+    const session = getSession(userId);
 
-// Get/create session
-const session = getSession(userId);
+    try {
 
-try {
+        // Show typing indicator
+        await ctx.sendChatAction("typing");
 
-    // Show typing indicator
-    await ctx.sendChatAction("typing");
+        // ====================================================
+        // RUN NEBULA AGENT
+        // ====================================================
 
-    // ====================================================
-    // RUN NEBULA AGENT
-    // ====================================================
+        const result = await runAgent({
+            userId,
+            message,
+            session
+        });
 
-    const result = await runAgent({
-        userId,
-        message,
-        session
-    });
+        // ====================================================
+        // SAVE UPDATED SESSION
+        // ====================================================
 
-    // ====================================================
-    // IMPORTANT:
-    // SAVE UPDATED SESSION
-    // ====================================================
+        if (result.session) {
+            sessions.set(userId, result.session);
+        }
 
-    if (result.session) {
-        sessions.set(userId, result.session);
+        // ====================================================
+        // SEND AGENT RESPONSE
+        // ====================================================
+
+        await ctx.reply(result.text);
+
+        console.log("🤖 Agent response:");
+        console.log(result.text);
+
+        console.log("📌 Session:");
+        console.log(sessions.get(userId));
+
+    } catch (error) {
+
+        console.error("\n❌ Telegram bot error:");
+        console.error(error);
+
+        await ctx.reply(
+            "❌ Sorry, something went wrong while processing your request."
+        );
     }
-
-    // ====================================================
-    // SEND AGENT RESPONSE
-    // ====================================================
-
-    await ctx.reply(result.text);
-
-    console.log("🤖 Agent response:");
-    console.log(result.text);
-
-    console.log("📌 Session:");
-    console.log(sessions.get(userId));
-
-} catch (error) {
-
-    console.error("\n❌ Agent error:");
-    console.error(error);
-
-    await ctx.reply(
-        "❌ Sorry, I couldn't process that request.\n\n" +
-        "Please try again."
-    );
-}
-
-
 });
 
 // ============================================================
@@ -129,20 +117,11 @@ try {
 // ============================================================
 
 bot.catch((error, ctx) => {
+    console.error("❌ Telegram error:", error);
 
-
-console.error("❌ Telegram bot error:", error);
-
-ctx.reply(
-    "❌ Something went wrong. Please try again."
-).catch((replyError) => {
-    console.error(
-        "❌ Could not send error message:",
-        replyError
-    );
-});
-
-
+    if (ctx) {
+        ctx.reply("❌ Something went wrong. Please try again.");
+    }
 });
 
 // ============================================================
@@ -151,30 +130,12 @@ ctx.reply(
 
 bot.launch();
 
-console.log(
-"🚀 Nebula Supermarket Telegram Agent started!"
-);
+console.log("🤖 Nebula Telegram Bot is running...");
 
 // ============================================================
 // GRACEFUL SHUTDOWN
 // ============================================================
 
-process.once("SIGINT", () => {
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
-
-console.log("\n🛑 Stopping Telegram bot...");
-
-bot.stop("SIGINT");
-
-
-});
-
-process.once("SIGTERM", () => {
-
-
-console.log("\n🛑 Stopping Telegram bot...");
-
-bot.stop("SIGTERM");
-
-
-});
